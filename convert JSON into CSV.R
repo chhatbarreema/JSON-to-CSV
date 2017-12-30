@@ -15,6 +15,6 @@ output <-- do.call("rbind", json_file)
 write.csv(a, file="json.csv",row.names = FALSE)
 file.show("json.csv")
 
-m <- matrix(data=cbind(rnorm(30, 0), rnorm(30, 2), rnorm(30, 5)), nrow=30, ncol=3)
-m
-apply(m, 1, mean)
+#m <- matrix(data=cbind(rnorm(30, 0), rnorm(30, 2), rnorm(30, 5)), nrow=30, ncol=3)
+#m
+#apply(m, 1, mean)
