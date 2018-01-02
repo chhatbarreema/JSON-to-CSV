@@ -1,20 +1,60 @@
+setwd("C:/Users/reema.chhatbar/Desktop/Reema")
+library(taskscheduleR)
+
+URL="http://srvmanager.tmsys.in:81/ServerManagerTmspl/dashboardtm/getDataApi"
+
+
+#download JSON file from API
+json_file=download.file(URL, quiet = FALSE,"finalfile.json", mode = "w" )
+
+
+#Convert JSON to Dataframe
 library(jsonlite)
-#library(RJSONIO)
-data1 <- read_json("Demo1.json")
-data1
-json_file <- lapply(data1, function(x) {
-  x[sapply(x, is.null)] <- NA
-  unlist(x)
-})
-final=matrix(unlist(json_file),ncol = 8, byrow = TRUE)
 
-#file=data.frame(final)
-file=data.frame(data1)
-file
-output <-- do.call("rbind", json_file)
-write.csv(a, file="json.csv",row.names = FALSE)
-file.show("json.csv")
+json_data= fromJSON("finalfile.json",simplifyVector = TRUE) 
+df_data=as.data.frame(json_data)
+typeof(df_data)
+View(df_data)
 
-#m <- matrix(data=cbind(rnorm(30, 0), rnorm(30, 2), rnorm(30, 5)), nrow=30, ncol=3)
-#m
-#apply(m, 1, mean)
+# Renaming Column names
+
+colClean <- function(x){ colnames(x) <- sub("server_data.", "", colnames(x)); x }
+df_data=colClean(df_data) #overwriting the dataframe
+View(df_data)
+
+# Dataframe to CSV
+
+write.csv(df_data,file="serverdata.csv")
+str(df_data)
+
+# df_data=data.frame(id= as.numeric())
+# df_data
+summary(df_data)
+
+#Character to date and time
+library(chron)
+as.Date(df_data$last_update_date_time)
+as.POSIXct(df_data$last_update_date_time)
+as.chron(df_data$last_update_date_time)
+
+new_last_update_date_time= as.POSIXlt(df_data$last_update_date_time)
+
+# Replacing h,m,s to column
+remaining_time_new=gsub(" ", ":", df_data$remaining_time)
+new_remaining_time=gsub("[[:alpha:](/\\w/)]", "", remaining_time_new)
+
+new_remaining_time
+#charatcter to time
+new_remaining_time= chron(times=df_data$remaining_time)
+
+
+
+#character to number
+new_id=as.numeric(df_data$id)
+
+# New data frame
+
+new_df=data.frame(new_id,new_last_update_date_time)
+
+#new converted CSV
+write.csv(new_df,file = "newserverdata.csv")
